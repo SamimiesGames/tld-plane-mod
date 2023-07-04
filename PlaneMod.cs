@@ -4,8 +4,8 @@ namespace TLD_PlaneMod
 {
     public static class PlaneModSettings
     {
-        public static string BASE_DATAPATH = "Mods\\PlaneMod\\planemod_data.json";
-        public static string PLANE_DATAPATH_WithGUID = "Mods\\PlaneMod\\planemod_plane_{0}.json";
+        public static string BASE_DATAPATH = "Mods\\planemod_data.json";
+        
         public static string ASSETBUNDLE_PATH = "Mods\\assetsforplanemod_assets_all.bundle";
         public static string PLANEMOD_BUNDLENAME = "PLANEMOD";
     }

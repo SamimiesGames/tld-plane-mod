@@ -9,7 +9,7 @@ public class PlaneModManager
         if (Singleton != null) return;
         Singleton = this;
         
-        Melon<PlaneMod>.Logger.Msg($"[PlaneModManager] Setting up");
+        Melon<PlaneMod>.Logger.Msg($"[PlaneModManager] Setup");
         
         new AircraftManager();
         new PlaneModDataManager();
