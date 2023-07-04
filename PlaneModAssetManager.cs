@@ -52,8 +52,7 @@ public class PlaneModAssetManager
         if (File.Exists(PlaneModSettings.ASSET_DEFINITION_PATH))
         {
             assetDefinitions = new PlaneModAssetDefinitions();
-            string jsonString = PlaneModDataUtility.ReadText(PlaneModSettings.ASSET_DEFINITION_PATH);
-            assetDefinitions.aircraftAssetDefinitions = JSON.Load(jsonString).Make<Dictionary<string, PlaneModAssetDefinition>>();
+            assetDefinitions.aircraftAssetDefinitions = PlaneModDataUtility.ReadJson<Dictionary<string, PlaneModAssetDefinition>>(PlaneModSettings.ASSET_DEFINITION_PATH);
 
             PlaneModLogger.Msg($"[PlaneModAssetManager] Loaded {assetDefinitions.aircraftAssetDefinitions.Keys.Count} Asset Definitions");
             foreach (var def in assetDefinitions.aircraftAssetDefinitions.Values)
