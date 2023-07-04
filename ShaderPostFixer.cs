@@ -3,23 +3,23 @@
 public class ShaderPostFixer
 {
     public Shader shader;
-    public GameObject target;
+    public GameObject gameObject;
     
     public ShaderPostFixer(GameObject aGameObject, Shader aShader)
     {
-        target = aGameObject;
+        gameObject = aGameObject;
         shader = aShader;
         
-        Melon<PlaneMod>.Logger.Msg($"[ShaderPostFixer] gameObject={aGameObject.name}, shader={shader.name}");
+        PlaneModLogger.MsgVerbose($"[ShaderPostFixer] gameObject={gameObject.name}, shader={shader.name}");
         
-        FixShader(target);
+        FixShader(gameObject);
     }
-    private void FixShader(GameObject gameObject)
+    private void FixShader(GameObject subGameObject)
     {
-        if (!gameObject) return;
+        if (!subGameObject) return;
         int i = 0;
 
-        Renderer renderer = gameObject.GetComponent<Renderer>();
+        Renderer renderer = subGameObject.GetComponent<Renderer>();
         if (renderer)
         {
             foreach (var lMaterial in renderer.materials)
@@ -28,9 +28,9 @@ public class ShaderPostFixer
             }
         }
             
-        while ( i < gameObject.transform.childCount)
+        while ( i < subGameObject.transform.childCount)
         {
-            FixShader(gameObject.transform.GetChild(i).gameObject);
+            FixShader(subGameObject.transform.GetChild(i).gameObject);
             i++;
         }
     }

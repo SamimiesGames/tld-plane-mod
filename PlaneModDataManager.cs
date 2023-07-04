@@ -1,44 +1,77 @@
-﻿namespace TLD_PlaneMod;
+﻿using MelonLoader.TinyJSON;
+
+namespace TLD_PlaneMod;
 
 public class PlaneModDataManager
 {
     public static PlaneModDataManager Singleton;
-    public PlaneModData planeModData;
     public PlaneModDataFixer dataFixer;
+    public PlaneModData planeModData;
+
+    public string CurrentDataPath
+    {
+        get
+        {
+            SaveSlotInfo saveSlotInfo = SaveGameSlotHelper.GetCurrentSaveSlotInfo();
+            if (saveSlotInfo == null) return null;
+            
+            string path = $"{PlaneModSettings.BASE_DATAPATH}_{saveSlotInfo.m_SaveSlotName}";
+
+            return path;
+        }
+    }
 
     public PlaneModDataManager()
     {
         if (Singleton != null) return;
         Singleton = this;
-        Melon<PlaneMod>.Logger.Msg($"[PlaneModDataManager] Setup");
-
-        dataFixer = new PlaneModDataFixer();
-        dataFixer.FixMissingFile(PlaneModSettings.BASE_DATAPATH);
         
-        LoadData();
+        PlaneModLogger.Msg($"[PlaneModDataManager] Setup");
+        
+        dataFixer = new PlaneModDataFixer();
+        planeModData = new PlaneModData();
 
-        Melon<PlaneMod>.Logger.Msg($"[PlaneModDataManager] Initialized");
+        PlaneModLogger.Msg($"[PlaneModDataManager] Initialized");
     }
 
     public void LoadData()
     {
-        Melon<PlaneMod>.Logger.Msg($"[PlaneModDataManager] LoadData");
+        if (CurrentDataPath == null)
+        {
+            PlaneModLogger.Warn($"[PlaneModDataManager] Couldn't create CurrentDataPath, because CurrentSaveSlotInfo is null");
+            PlaneModLogger.Warn($"[PlaneModDataManager] Aborted LoadData");
+            return;
+        }
+        else
+        {
+            if(!File.Exists(CurrentDataPath)) PlaneModDataUtility.WriteDataWithBase(CurrentDataPath, PlaneModSettings.BASE_DATAPATH);
+        }
+        PlaneModLogger.MsgVerbose($"[PlaneModDataManager] LoadData");
         try
         {
-            planeModData = JsonUtility.FromJson<PlaneModData>(PlaneModSettings.BASE_DATAPATH);
-            if (planeModData == null)
+            if (!File.Exists(CurrentDataPath))
             {
-                Melon<PlaneMod>.Logger.Warning($"[PlaneModDataManager] Failed to decode data from {PlaneModSettings.BASE_DATAPATH}");
+                PlaneModLogger.WarnMissingFile(CurrentDataPath);
+                PlaneModLogger.Warn($"[PlaneModDataManager] Aborted LoadData");
                 return;
             }
-            else
+            
+            planeModData = PlaneModDataUtility.ReadJson<PlaneModData>(CurrentDataPath);
+
+            if (planeModData == null)
             {
-                planeModData = dataFixer.FixMissingOrBrokenData(planeModData);
+                PlaneModLogger.Warn(
+                    $"[PlaneModDataManager] Failed to decode data from {CurrentDataPath}");
+                return;
             }
+        }
+        catch (FileNotFoundException)
+        {
+            PlaneModLogger.Warn($"[PlaneModDataManager] {CurrentDataPath} not found!");
         }
         catch (Exception)
         {
-            Melon<PlaneMod>.Logger.Warning($"[PlaneModDataManager] Something went wrong while loading {PlaneModSettings.BASE_DATAPATH}");
+            PlaneModLogger.Warn($"[PlaneModDataManager] Something went wrong while loading {CurrentDataPath}");
         }
     }
 }

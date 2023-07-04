@@ -1,0 +1,12 @@
+﻿{
+  "CropDuster01": {
+    "prefabName" : "Assets/Prefabs/PLANEMOD_CropDuster01.prefab",
+    "worldCollider": "CropDuster01_Fuselage",
+    "landingGear": [
+      "CropDuster01_RightLandingGear",
+      "CropDuster01_LeftLandingGear",
+      "CropDuster01_RearLandingGear"
+    ],
+    "mass": 800
+  }
+}

@@ -1,0 +1,31 @@
+﻿{
+  "aircraftData": [
+    {
+      "asset": "CropDuster01",
+      "sceneName": "RuralRegion",
+      "position": [
+        0,
+        0,
+        0
+      ],
+      "rotation": [
+        0,
+        89.98,
+        0
+      ],
+      "velocity": [
+        0,
+        0,
+        0
+      ],
+      "guidance": [
+        0,
+        0,
+        0
+      ],
+      "rpm": 0,
+      "fuel": 85,
+      "guid": ""
+    }
+  ]
+}
