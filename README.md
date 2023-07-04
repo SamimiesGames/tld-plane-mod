@@ -1,5 +1,5 @@
 ﻿# PLANE MOD FOR THE LONG DARK
-![](Assets\Plane_V1_IG.png)
+![](https://github.com/SamimiesGames/tld-plane-mod/tree/master/Assets/Plane_V1_IG.png)
 ### Enjoy the scenery of Great Bear from the birdseye view! Deliver crucial supplies quickly across the island! 
 
 ## HOW THE MOD WORKS
