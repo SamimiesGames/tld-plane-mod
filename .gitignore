@@ -224,3 +224,5 @@ Unity
 bin
 bin/*
 .dll
+bin/Debug/net6.0/tld-plane-mod.deps.json
+bin/Debug/net6.0/tld-plane-mod.dll
