@@ -17,40 +17,64 @@ public class PlaneAutoRigger
 
         PlaneModLogger.MsgVerbose($"[PlaneAutoRigger] Instantiate");
         GameObject gameObject = GameObject.Instantiate(prefab);
-        
+
         PlaneModLogger.MsgVerbose($"[PlaneAutoRigger] Rig Transform");
         gameObject.transform.position = position;
-        
+
 
         PlaneModLogger.MsgVerbose($"[PlaneAutoRigger] Rig worldCollider");
         FindGameObjectByName(gameObject, definition.worldCollider);
-        
+
         if (_recursiveFoundGameObject)
         {
             RigGameObjectWithConvexMeshCollider(_recursiveFoundGameObject);
+            _recursiveFoundGameObject = null;
         }
 
         PlaneModLogger.MsgVerbose($"[PlaneAutoRigger] Rig LandingGear");
         foreach (var landingGear in definition.landingGear)
         {
             FindGameObjectByName(gameObject, landingGear);
-        
+
             if (_recursiveFoundGameObject)
             {
                 RigGameObjectWithConvexMeshCollider(_recursiveFoundGameObject);
+                _recursiveFoundGameObject = null;
             }
         }
-        
+
         PlaneModLogger.MsgVerbose($"[PlaneAutoRigger] Rig Rigidbody");
         Rigidbody rigidBody = gameObject.AddComponent<Rigidbody>();
         rigidBody.drag = 0.5f;
         rigidBody.useGravity = true;
         rigidBody.mass = definition.mass;
-        
+
         PlaneModLogger.MsgVerbose($"[PlaneAutoRigger] Fixing shaders");
-        
+
         Shader standardShader = Shader.Find("Standard");
         new ShaderPostFixer(gameObject, standardShader);
+
+        Engine engine = new Engine(
+            definition.enginePower, definition.maxRPM,
+            definition.acceleration, definition.fuelCapacity,
+            definition.fuelCapacity
+        );
+
+        if(string.IsNullOrEmpty(definition.guid)) definition.guid = Guid.NewGuid().ToString();
+        Aircraft aircraft = new Aircraft(
+            gameObject,
+            rigidBody,
+            engine,
+            definition.yawSpeed,
+            definition.pitchSpeed,
+            definition.rollSpeed,
+            definition.maxSpeed,
+            definition.minSpeed,
+            definition.maxAltitude,
+            definition.guid
+        );
+        
+        AircraftManager.Singleton.AddNewAircraft(aircraft);
         
         PlaneModLogger.MsgVerbose($"[PlaneAutoRigger] Rigging is partial");
 
@@ -82,6 +106,6 @@ public class PlaneAutoRigger
         PlaneModLogger.MsgVerbose($"[PlaneAutoRigger] RigGameObjectWithConvexMeshCollider gameObject={gameObject.name}");
         MeshCollider meshCollider = gameObject.AddComponent<MeshCollider>();
         meshCollider.convex = true;
-        gameObject.layer = 17;
+        meshCollider.gameObject.layer = 17;
     }
 }

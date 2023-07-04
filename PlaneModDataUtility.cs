@@ -6,14 +6,24 @@ public class PlaneModDataUtility
 {
     public static T ReadJson<T>(string path)
     {
+        PlaneModLogger.MsgVerbose($"[PlaneModDataUtility] ReadJson path={path}");
+        
         string content = ReadText(path);
         T type = JSON.Load(content).Make<T>();
         
         return type;
     }
     
+    public static void WriteJson<T>(string path, T data)
+    {
+        PlaneModLogger.MsgVerbose($"[PlaneModDataUtility] WriteJson path={path}");
+        string jsonString = JSON.Dump(data);
+        WriteData(path, jsonString);
+    }
+    
     public static Variant ReadJsonRaw(string path)
     {
+        PlaneModLogger.MsgVerbose($"[PlaneModDataUtility] ReadJsonRaw path={path}");
         string content = ReadText(path);
         Variant variant = JSON.Load(content);
         
@@ -22,6 +32,7 @@ public class PlaneModDataUtility
     
     public static string ReadText(string path)
     {
+        PlaneModLogger.MsgVerbose($"[PlaneModDataUtility] ReadText path={path}");
         string content = File.ReadAllText(path);
         return content;
     }

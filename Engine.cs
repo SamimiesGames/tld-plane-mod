@@ -6,13 +6,19 @@ public class Engine
     public float maxRPM;
     public float acceleration;
 
+    public float fuel;
+    public float fuelCapacity;
+
     public float rpm;
 
-    public Engine(float aHorsePower, float aMaxRPM, float aAcceleration)
+    public Engine(float aHorsePower, float aMaxRPM, float aAcceleration, float aFuel, float aFuelCapacity)
     {
         horsePower = aHorsePower;
         maxRPM = aMaxRPM;
         acceleration = aAcceleration;
+
+        fuel = aFuel;
+        fuelCapacity = aFuelCapacity;
     }
 
     public float PowerOutput

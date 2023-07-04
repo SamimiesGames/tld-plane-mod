@@ -11,7 +11,8 @@
         public float rollSpeed;
 
         public float maxSpeed;
-        
+        public float minSpeed;
+
         public float maxAltitude;
 
         public float speed;
@@ -19,9 +20,16 @@
         public Vector3 angularVelocity;
 
         public Vector3 guidance;
+
+        public string guid;
         
 
-        public Aircraft(GameObject aPlaneGameObject, Rigidbody aRigidbody, Engine aEngine, float aYawSpeed, float aPitchSpeed, float aRollSpeed, float aMaxSpeed, float aMaxAltitude)
+        public Aircraft(
+            GameObject aPlaneGameObject, Rigidbody aRigidbody, Engine aEngine,
+            float aYawSpeed, float aPitchSpeed, float aRollSpeed,
+            float aMaxSpeed, float aMinSpeed, float aMaxAltitude,
+            string aGuid
+        )
         {
             planeGameObject = aPlaneGameObject;
             rigidbody = aRigidbody;
@@ -33,11 +41,14 @@
             rollSpeed = aRollSpeed;
             
             maxSpeed = aMaxSpeed;
+            minSpeed = aMinSpeed;
             maxAltitude = aMaxAltitude;
-
+            
             velocity = Vector3.zero;
             guidance = Vector3.zero;
             speed = 0;
+
+            guid = aGuid;
         }
 
         public void Update(float timeDelta)

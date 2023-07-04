@@ -14,7 +14,6 @@ namespace TLD_PlaneMod
     public class PlaneMod : MelonMod
     {
         public bool firstFrame;
-        public GameObject plane;
         
         public override void OnInitializeMelon()
         {
@@ -28,6 +27,31 @@ namespace TLD_PlaneMod
             );
             
             UnityBundleManager.Singleton.DumpAssetNames(PlaneModSettings.PLANEMOD_BUNDLENAME);
+            
+            uConsole.RegisterCommand("spawn_plane", new Action(SpawnPlane));
+            uConsole.RegisterCommand("save_planemod", new Action(SavePlaneMod));
+        }
+
+        private void SpawnPlane()
+        {
+            RaycastHit hit;
+            bool hasHit = Physics.Raycast(
+                GameManager.m_MainCamera.transform.position,
+                GameManager.m_MainCamera.transform.forward,
+                hitInfo: out hit,
+                1000,
+                layerMask: Utils.m_WeaponProjectileCollisionLayerMask
+            );
+            Vector3 position = hasHit ? hit.point : GameManager.m_MainCamera.transform.position + GameManager.m_MainCamera.transform.forward * 1000;
+            position -= GameManager.m_MainCamera.transform.forward;
+
+            GameObject plane = PlaneModAssetManager.Singleton.SpawnPlane("CropDuster01", position);
+            plane.transform.Translate(0, 3.56f, 0);
+        }
+
+        private void SavePlaneMod()
+        {
+            PlaneModDataManager.Singleton.SaveData();
         }
 
         public override void OnUpdate()
@@ -36,32 +60,8 @@ namespace TLD_PlaneMod
 
             if (!SceneManager.GetActiveScene().isLoaded || !GameManager.m_MainCamera) return;
 
-            if (!firstFrame)
-            {
-                firstFrame = true;
-                PlaneModDataManager.Singleton.LoadData();
-                plane = TryCreateFromBundle();
-            }
-
-            if (plane)
-            {
-                plane.transform.Rotate(0, 25 * Time.deltaTime, 0);
-            }
-
             AircraftManager.Singleton.Update(Time.deltaTime);
-
-        }
-
-        public GameObject TryCreateFromBundle()
-        {
-            Vector3 position = GameManager.m_MainCamera.transform.position +
-                               GameManager.m_MainCamera.transform.forward * 25;
-
-            position.y += 6.75f;
-
-            GameObject lGameObject = PlaneModAssetManager.Singleton.SpawnPlane("CropDuster01", position);
-            
-            return lGameObject;
+            PlaneModDataManager.Singleton.UpdateModelStreaming(Time.deltaTime);
         }
     }   
 }

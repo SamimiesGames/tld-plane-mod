@@ -7,6 +7,25 @@
       "CropDuster01_LeftLandingGear",
       "CropDuster01_RearLandingGear"
     ],
-    "mass": 800
+    "mass": 800,
+    "enginePower": 396,
+    "maxRPM": 4000,
+    "acceleration": 500,
+
+    "maxAltitude": 5500,
+
+    "maxSpeed": 165,
+    "minSpeed": 65,
+
+    "yawSpeed": 55,
+    "pitchSpeed": 48.75,
+    "rollSpeed": 95.765,
+
+    "carryCapacity": 150,
+
+    "fuelCapacity": 85,
+    "fuelConsumption": 0.941176470588235,
+
+    "guid": ""
   }
 }

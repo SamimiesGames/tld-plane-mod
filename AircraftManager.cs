@@ -12,7 +12,7 @@ public class AircraftManager
         Singleton = this;
         aircrafts = new List<Aircraft>();
         
-        Melon<PlaneMod>.Logger.Msg($"[AircraftManager] Initialized");
+        PlaneModLogger.Msg($"[AircraftManager] Initialized");
     }
 
     public void Update(float timeDelta)
@@ -27,13 +27,23 @@ public class AircraftManager
 
     public void AddNewAircraft(Aircraft aircraft)
     {
-        Melon<PlaneMod>.Logger.Msg($"[AircraftManager] AddNewAircraft aircraft={aircraft.planeGameObject.name}");
+        PlaneModLogger.Msg($"[AircraftManager] AddNewAircraft aircraft={aircraft.planeGameObject.name}");
         aircrafts.Add(aircraft);
     }
 
     public void RemoveAircraft(Aircraft aircraft)
     {
-        Melon<PlaneMod>.Logger.Msg($"[AircraftManager] RemoveAircraft aircraft={aircraft.planeGameObject.name}");
+        PlaneModLogger.Msg($"[AircraftManager] RemoveAircraft aircraft={aircraft.planeGameObject.name}");
         aircrafts.Remove(aircraft);
+    }
+
+    public void UnLoadAll()
+    {
+        PlaneModLogger.Msg($"[AircraftManager] UnLoadAll");
+
+        foreach (var aircraft in aircrafts)
+        {
+            RemoveAircraft(aircraft);
+        }
     }
 }
