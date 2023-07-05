@@ -53,17 +53,48 @@ public class PlaneModDataManager
         PlaneModLogger.Msg($"[PlaneModDataManager] Initialized");
     }
 
-    public void UpdateModelStreaming(float timeDelta)
+    public void UpdateModelStreaming()
     {
-        if (!SceneManager.GetActiveScene().isLoaded || SceneManager.GetActiveScene().guid == lastSceneGUID) return;
-        
+        // TODO: Find out a way to identify scene change!
+        string sceneGUID = SceneManager.GetActiveScene().guid;
+        if (!SceneManager.GetActiveScene().isLoaded || sceneGUID == lastSceneGUID) return;
+        lastSceneGUID = sceneGUID;
+
         if(dataLoadState == PlaneModDataLoadState.UnLoaded) LoadData();
         
-        PlaneModLogger.Msg($"[PlaneModDataManager] UpdateModelStreaming dataLoadState={dataLoadState}, guid={SceneManager.GetActiveScene().guid}");
+        PlaneModLogger.Msg($"[PlaneModDataManager] UpdateModelStreaming dataLoadState={dataLoadState}, sceneGUID={sceneGUID}");
 
         AircraftManager.Singleton.UnLoadAll();
-        
-        lastSceneGUID = SceneManager.GetActiveScene().guid;
+        LoadAircraftForScene(sceneGUID);
+    }
+
+    public void LoadAircraftForScene(string sceneGUID)
+    {
+        foreach (var data in planeModData.aircraftData)
+        {
+            if (data.sceneGUID == sceneGUID)
+            {
+                PlaneModLogger.Msg($"[PlaneModDataManager] LoadAircraftForScene asset={data.asset}, sceneGUID={sceneGUID}");
+                
+                Vector3 position = new Vector3(data.position[0], data.position[1], data.position[2]);
+                Vector3 velocity = new Vector3(data.velocity[0], data.velocity[1], data.velocity[2]);
+                Vector3 angularVelocity = new Vector3(data.angularVelocity[0], data.angularVelocity[1], data.angularVelocity[2]);
+                Vector3 guidance = new Vector3(data.guidance[0], data.guidance[1], data.guidance[2]);
+                
+                GameObject plane = PlaneModAssetManager.Singleton.SpawnPlane(data.asset, position, false);
+                Aircraft aircraft = AircraftManager.Singleton.aircrafts[AircraftManager.Singleton.aircrafts.Count - 1];
+
+                aircraft.planeGameObject = plane;
+                
+                plane.transform.position = position;
+                aircraft.velocity = velocity;
+                aircraft.angularVelocity = angularVelocity;
+                aircraft.guidance = guidance;
+                aircraft.engine.rpm = data.rpm;
+                aircraft.engine.fuel = data.fuel;
+                aircraft.guid = data.guid;
+            }
+        }
     }
 
     public void UpdateAircraftData()
@@ -80,6 +111,7 @@ public class PlaneModDataManager
                 {
                     aircraftData = data;
                     found = true;
+                    break;
                 }
             }
 
@@ -122,6 +154,54 @@ public class PlaneModDataManager
         PlaneModLogger.MsgVerbose($"[PlaneModDataManager] dataInstancesUpdated={dataInstancesUpdated}");
     }
 
+    public void CreateNewDataInstance(Aircraft aircraft, string prefabName)
+    {
+        PlaneModAircraftData data = new PlaneModAircraftData();
+        
+        data.guid = aircraft.guid;
+        data.asset = prefabName;
+        data.position = new float[3]
+        {
+            aircraft.planeGameObject.transform.position.x,
+            aircraft.planeGameObject.transform.position.y,
+            aircraft.planeGameObject.transform.position.z,
+        };
+        data.rotation = new float[4]
+        {
+            aircraft.planeGameObject.transform.rotation.x,
+            aircraft.planeGameObject.transform.rotation.y,
+            aircraft.planeGameObject.transform.rotation.z,
+            aircraft.planeGameObject.transform.rotation.w,
+        };
+        data.guidance = new float[3]
+        {
+            aircraft.guidance.x,
+            aircraft.guidance.y,
+            aircraft.guidance.z,
+        };
+        data.angularVelocity = new float[3]
+        {
+            aircraft.angularVelocity.x,
+            aircraft.angularVelocity.y,
+            aircraft.angularVelocity.z
+        };
+        data.velocity = new float[3]
+        {
+            aircraft.velocity.x,
+            aircraft.velocity.y,
+            aircraft.velocity.z
+        };
+        data.fuel = aircraft.engine.fuel;
+        data.rpm = aircraft.engine.rpm;
+        data.sceneGUID = SceneManager.GetActiveScene().guid;
+
+        List<PlaneModAircraftData> list = planeModData.aircraftData.ToList();
+        list.Add(data);
+        planeModData.aircraftData = list.ToArray();
+        
+        PlaneModLogger.Msg($"[PlaneModDataManager] Created new data instance");
+    }
+
     public void SaveData()
     {
         if (CurrentDataPath == null)
@@ -144,7 +224,16 @@ public class PlaneModDataManager
                 return;
             }
 
-            UpdateAircraftData();
+            try
+            {
+                UpdateAircraftData();
+            }
+            catch (NullReferenceException)
+            {
+                PlaneModLogger.Warn($"[PlaneModDataManager] NullReferenceException in UpdateAircraftData!");;
+                PlaneModLogger.Warn($"[PlaneModDataManager] Aborted SaveData");
+                return;
+            }
             PlaneModLogger.MsgVerbose($"[PlaneModDataManager] SaveData aircraftData to be saved {planeModData.aircraftData.Length}");
             string jsonData = JSON.Dump(planeModData.aircraftData);
             PlaneModDataUtility.WriteData(CurrentDataPath, jsonData);
@@ -153,9 +242,9 @@ public class PlaneModDataManager
         {
             PlaneModLogger.Warn($"[PlaneModDataManager] {CurrentDataPath} not found!");
         }
-        catch (Exception)
+        catch (Exception e)
         {
-            PlaneModLogger.Warn($"[PlaneModDataManager] Something went wrong while saving in {CurrentDataPath}. This could be that data is stored in a wrong datamodel!");
+            PlaneModLogger.Warn($"[PlaneModDataManager] Unknown error {e}!");
         }
     }
     
@@ -195,10 +284,9 @@ public class PlaneModDataManager
             dataLoadState = PlaneModDataLoadState.UnLoaded;
             PlaneModLogger.Warn($"[PlaneModDataManager] {CurrentDataPath} not found!");
         }
-        catch (Exception)
+        catch (Exception e)
         {
-            dataLoadState = PlaneModDataLoadState.UnLoaded;
-            PlaneModLogger.Warn($"[PlaneModDataManager] Something went wrong while loading {CurrentDataPath}. This could be that data is stored in a wrong datamodel!");
+            PlaneModLogger.Warn($"[PlaneModDataManager] Unknown error {e}!");
         }
     }
 }

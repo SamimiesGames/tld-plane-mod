@@ -17,7 +17,30 @@ public class AircraftManager
 
     public void Update(float timeDelta)
     {
+        //EliminateNulls();
         UpdateAircraft(timeDelta);
+    }
+
+    private void EliminateNulls()
+    {
+        int eliminatedNulls = 0;
+        
+        List<Aircraft> aircraftReconstructed = new List<Aircraft>();
+        
+        foreach (var aircraft in new List<Aircraft>(aircrafts))
+        {
+            if (aircraft.planeGameObject == null)
+            {
+                eliminatedNulls++;
+                continue;
+            }
+
+            aircraftReconstructed.Add(aircraft);
+        }
+
+        if(eliminatedNulls > 0) aircrafts = aircraftReconstructed;
+        
+        if(eliminatedNulls > 0) PlaneModLogger.Msg($"[AircraftManager] EliminateNulls eliminatedNulls={eliminatedNulls}");
     }
 
     private void UpdateAircraft(float timeDelta)
@@ -34,7 +57,11 @@ public class AircraftManager
     public void RemoveAircraft(Aircraft aircraft)
     {
         PlaneModLogger.Msg($"[AircraftManager] RemoveAircraft aircraft={aircraft.planeGameObject.name}");
+        PlaneModDataManager.Singleton.UpdateAircraftData();
+        
         aircrafts.Remove(aircraft);
+        
+        GameObject.Destroy(aircraft.planeGameObject);
     }
 
     public void UnLoadAll()

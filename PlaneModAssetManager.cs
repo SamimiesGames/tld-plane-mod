@@ -84,51 +84,18 @@ public class PlaneModAssetManager
 
         GameObject plane = planeAutoRigger.Rig(prefab, position);
 
+        Aircraft aircraft = AircraftManager.Singleton.aircrafts[AircraftManager.Singleton.aircrafts.Count-1];
+        
         if (createNewDataInstance)
         {
-            PlaneModAircraftData data = new PlaneModAircraftData();
-
-            Aircraft aircraft = AircraftManager.Singleton.aircrafts[AircraftManager.Singleton.aircrafts.Count-1];
-            data.guid = aircraft.guid;
-            data.asset = prefabName;
-            data.position = new float[3]
-            {
-                aircraft.planeGameObject.transform.position.x,
-                aircraft.planeGameObject.transform.position.y,
-                aircraft.planeGameObject.transform.position.z,
-            };
-            data.rotation = new float[4]
-            {
-                aircraft.planeGameObject.transform.rotation.x,
-                aircraft.planeGameObject.transform.rotation.y,
-                aircraft.planeGameObject.transform.rotation.z,
-                aircraft.planeGameObject.transform.rotation.w,
-            };
-            data.guidance = new float[3]
-            {
-                aircraft.guidance.x,
-                aircraft.guidance.y,
-                aircraft.guidance.z,
-            };
-            data.angularVelocity = new float[3]
-            {
-                aircraft.angularVelocity.x,
-                aircraft.angularVelocity.y,
-                aircraft.angularVelocity.z
-            };
-            data.velocity = new float[3]
-            {
-                aircraft.velocity.x,
-                aircraft.velocity.y,
-                aircraft.velocity.z
-            };
-            data.fuel = aircraft.engine.fuel;
-            data.rpm = aircraft.engine.rpm;
-            data.sceneGUID = SceneManager.GetActiveScene().guid;
-
-            PlaneModDataManager.Singleton.planeModData.aircraftData.AddItem(data);
-            PlaneModLogger.Msg($"[PlaneModAssetManager] SpawnPlane Created new data instance");
+            PlaneModDataManager.Singleton.CreateNewDataInstance(aircraft, prefabName);
         }
+
+        if (aircraft.planeGameObject == null)
+        {
+            PlaneModLogger.Warn($"[PlaneModAssetManager] PLANE WAS RIGGED WITH OUT A GAMEOBJECT!");
+        }
+        
 
         return plane;
     }
@@ -143,10 +110,6 @@ public class PlaneModAssetManager
             assetDefinitions.aircraftAssetDefinitions = PlaneModDataUtility.ReadJson<Dictionary<string, PlaneModAssetDefinition>>(PlaneModSettings.ASSET_DEFINITION_PATH);
 
             PlaneModLogger.Msg($"[PlaneModAssetManager] Loaded {assetDefinitions.aircraftAssetDefinitions.Keys.Count} Asset Definitions");
-            foreach (var def in assetDefinitions.aircraftAssetDefinitions.Values)
-            {
-                PlaneModLogger.MsgVerbose($"[PlaneModAssetManager] {def}");
-            }
         }
         else
         {

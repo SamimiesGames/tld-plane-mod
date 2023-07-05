@@ -25,9 +25,7 @@ namespace TLD_PlaneMod
                 PlaneModSettings.PLANEMOD_BUNDLENAME, 
                 PlaneModSettings.ASSETBUNDLE_PATH
             );
-            
-            UnityBundleManager.Singleton.DumpAssetNames(PlaneModSettings.PLANEMOD_BUNDLENAME);
-            
+
             uConsole.RegisterCommand("spawn_plane", new Action(SpawnPlane));
             uConsole.RegisterCommand("save_planemod", new Action(SavePlaneMod));
         }
@@ -60,8 +58,8 @@ namespace TLD_PlaneMod
 
             if (!SceneManager.GetActiveScene().isLoaded || !GameManager.m_MainCamera) return;
 
+            PlaneModDataManager.Singleton.UpdateModelStreaming();
             AircraftManager.Singleton.Update(Time.deltaTime);
-            PlaneModDataManager.Singleton.UpdateModelStreaming(Time.deltaTime);
         }
     }   
 }

@@ -53,6 +53,7 @@
 
         public void Update(float timeDelta)
         {
+            if (planeGameObject == null) return;
             UpdateSpeed(timeDelta);
             UpdateRotation(timeDelta);
 
