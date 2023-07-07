@@ -6,7 +6,8 @@ namespace TLD_PlaneMod;
 public enum PlaneModDataLoadState
 {
     UnLoaded,
-    Loaded
+    Loaded,
+    Saved
 }
 
 public class PlaneModDataManager
@@ -23,6 +24,7 @@ public class PlaneModDataManager
         get
         {
             string path = $"{PlaneModSettings.BASE_DATAPATH}";
+            
             /*
             if (string.IsNullOrEmpty(SaveGameSystem.m_CurrentSaveName))
             {
@@ -52,12 +54,13 @@ public class PlaneModDataManager
         
         PlaneModLogger.Msg($"[PlaneModDataManager] Initialized");
     }
-
-    public void UpdateModelStreaming()
+    /*
+    Only call UpdateModelStreaming call from MelonMod.OnSceneWasLoaded 
+    */
+    public void UpdateModelStreaming(string sceneGUID)
     {
         // TODO: Find out a way to identify scene change!
-        string sceneGUID = SceneManager.GetActiveScene().guid;
-        if (!SceneManager.GetActiveScene().isLoaded || sceneGUID == lastSceneGUID) return;
+        if (sceneGUID == lastSceneGUID) return;
         lastSceneGUID = sceneGUID;
 
         if(dataLoadState == PlaneModDataLoadState.UnLoaded) LoadData();
@@ -193,7 +196,7 @@ public class PlaneModDataManager
         };
         data.fuel = aircraft.engine.fuel;
         data.rpm = aircraft.engine.rpm;
-        data.sceneGUID = SceneManager.GetActiveScene().guid;
+        data.sceneGUID = lastSceneGUID;
 
         List<PlaneModAircraftData> list = planeModData.aircraftData.ToList();
         list.Add(data);
@@ -235,8 +238,11 @@ public class PlaneModDataManager
                 return;
             }
             PlaneModLogger.MsgVerbose($"[PlaneModDataManager] SaveData aircraftData to be saved {planeModData.aircraftData.Length}");
+            
             string jsonData = JSON.Dump(planeModData.aircraftData);
             PlaneModDataUtility.WriteData(CurrentDataPath, jsonData);
+            
+            dataLoadState = PlaneModDataLoadState.Saved;
         }
         catch (FileNotFoundException)
         {

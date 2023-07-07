@@ -57,9 +57,7 @@ namespace TLD_PlaneMod
             base.OnUpdate();
 
             if (!SceneManager.GetActiveScene().isLoaded || !GameManager.m_MainCamera) return;
-
-            PlaneModDataManager.Singleton.UpdateModelStreaming();
-            AircraftManager.Singleton.Update(Time.deltaTime);
+            PlaneModManager.Singleton.Update();
         }
     }   
 }

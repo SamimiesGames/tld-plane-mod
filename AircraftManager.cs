@@ -17,7 +17,7 @@ public class AircraftManager
 
     public void Update(float timeDelta)
     {
-        //EliminateNulls();
+        EliminateNulls();
         UpdateAircraft(timeDelta);
     }
 
@@ -40,7 +40,7 @@ public class AircraftManager
 
         if(eliminatedNulls > 0) aircrafts = aircraftReconstructed;
         
-        if(eliminatedNulls > 0) PlaneModLogger.Msg($"[AircraftManager] EliminateNulls eliminatedNulls={eliminatedNulls}");
+        if(eliminatedNulls > 0) PlaneModLogger.Warn($"[AircraftManager] EliminateNulls eliminatedNulls={eliminatedNulls}");
     }
 
     private void UpdateAircraft(float timeDelta)
