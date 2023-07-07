@@ -5,6 +5,7 @@ namespace TLD_PlaneMod
     public static class PlaneModSettings
     {
         public static string BASE_DATAPATH = "Mods\\planemod_data.json";
+        public static string NEWSAVE_FORMATTABLE_DATAPATH = "Mods\\planemod_data{0}.json";
         
         public static string ASSETBUNDLE_PATH = "Mods\\assetsforplanemod_assets_all.bundle";
         public static string PLANEMOD_BUNDLENAME = "PLANEMOD";
@@ -27,7 +28,10 @@ namespace TLD_PlaneMod
             );
 
             uConsole.RegisterCommand("spawn_plane", new Action(SpawnPlane));
-            uConsole.RegisterCommand("save_planemod", new Action(SavePlaneMod));
+            uConsole.RegisterCommand("planemod_save", new Action(SavePlaneMod));
+            uConsole.RegisterCommand("planemod_load", new Action(LoadPlaneMod));
+            uConsole.RegisterCommand("planemod_devmode", new Action(DevMode));
+            uConsole.RegisterCommand("planemod_force_update_model_streaming", new Action(ForceUpdateModelStreaming));
         }
 
         private void SpawnPlane()
@@ -50,6 +54,26 @@ namespace TLD_PlaneMod
         private void SavePlaneMod()
         {
             PlaneModDataManager.Singleton.SaveData();
+        }
+
+        private void LoadPlaneMod()
+        {
+            PlaneModDataManager.Singleton.LoadData();
+        }
+        
+        private void ForceUpdateModelStreaming()
+        {
+            PlaneModDataManager.Singleton.UpdateModelStreaming(PlaneModDataManager.Singleton.lastSceneGUID);
+        }
+        
+        private void DevMode()
+        {
+            PlaneModDataManager.Singleton.dataManagementMode = 
+                PlaneModDataManager.Singleton.dataManagementMode == PlaneModDataManagementMode.Development ?
+                    PlaneModDataManagementMode.Normal : 
+                    PlaneModDataManagementMode.Development;
+            
+            PlaneModLogger.Msg($"[DevMode] Set dataManagementMode as {PlaneModDataManager.Singleton.dataManagementMode}");
         }
 
         public override void OnUpdate()

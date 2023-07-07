@@ -24,13 +24,7 @@ public class PlaneModManager
         if (GameManager.GetUniStorm().m_CurrentRegion)
         {
             string regionName = GameManager.m_ActiveScene;
-            /*
-            SaveSlotInfo saveSlotInfo = SaveGameSlotHelper.GetSaveSlotInfo(SaveSlotType.SANDBOX, 0);
-            if (saveSlotInfo != null)
-            {
-                PlaneModLogger.Msg($"[PlaneModManager] FIND_SAVE_BAKED GameId={saveSlotInfo.m_GameId} SaveSlotName={saveSlotInfo.m_SaveSlotName}");
-            }
-            */
+
             if (regionName != lastRegionName)
             {
                 PlaneModDataManager.Singleton.UpdateModelStreaming(regionName);

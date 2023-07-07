@@ -9,6 +9,11 @@ public enum PlaneModDataLoadState
     Loaded,
     Saved
 }
+public enum PlaneModDataManagementMode
+{
+    Normal,
+    Development
+}
 
 public class PlaneModDataManager
 {
@@ -17,26 +22,21 @@ public class PlaneModDataManager
     public PlaneModData planeModData;
 
     public PlaneModDataLoadState dataLoadState;
+    public PlaneModDataManagementMode dataManagementMode;
     public string lastSceneGUID;
 
     public string CurrentDataPath
     {
         get
         {
-            string path = $"{PlaneModSettings.BASE_DATAPATH}";
+            string savePathSuffix = $"{SaveGameSystem.m_CurrentGameId}";
+            string path = string.Format(PlaneModSettings.NEWSAVE_FORMATTABLE_DATAPATH, savePathSuffix);
             
-            /*
-            if (string.IsNullOrEmpty(SaveGameSystem.m_CurrentSaveName))
+            if (dataManagementMode == PlaneModDataManagementMode.Development)
             {
-                PlaneModLogger.Warn($"[PlaneModDataManager] CurrentDataPath is null!");
-                return null;
+                path = PlaneModSettings.BASE_DATAPATH;
             }
-            else
-            {
-                path += $"\\{SaveGameSystem.m_CurrentSaveName}";
-            }
-            */
-            
+
             return path;
         }
     }
@@ -65,7 +65,7 @@ public class PlaneModDataManager
 
         if(dataLoadState == PlaneModDataLoadState.UnLoaded) LoadData();
         
-        PlaneModLogger.Msg($"[PlaneModDataManager] UpdateModelStreaming dataLoadState={dataLoadState}, sceneGUID={sceneGUID}");
+        PlaneModLogger.Msg($"[PlaneModDataManager] UpdateModelStreaming dataLoadState={dataLoadState}, dataManagementMode={dataManagementMode}, sceneGUID={sceneGUID}");
 
         AircraftManager.Singleton.UnLoadAll();
         LoadAircraftForScene(sceneGUID);
@@ -209,21 +209,23 @@ public class PlaneModDataManager
     {
         if (CurrentDataPath == null)
         {
-            PlaneModLogger.Warn($"[PlaneModDataManager] CurrentSaveSlotInfo is null");
-            PlaneModLogger.Warn($"[PlaneModDataManager] Aborted SaveData");
+            PlaneModLogger.Warn($"[PlaneModDataManager] CurrentDataPath is null");
+            PlaneModLogger.Warn($"[PlaneModDataManager] SaveData Failed!");
             return;
         }
-        else
+        if (!File.Exists(CurrentDataPath))
         {
-            if(!File.Exists(CurrentDataPath)) PlaneModDataUtility.WriteDataWithBase(CurrentDataPath, PlaneModSettings.BASE_DATAPATH);
+            PlaneModLogger.Msg($"[PlaneModDataManager] CurrentDataPath doesn't exists. Creating One!");
+            PlaneModDataUtility.WriteDataWithBase(CurrentDataPath, PlaneModSettings.BASE_DATAPATH);
         }
-        PlaneModLogger.Msg($"[PlaneModDataManager] SaveData");
+        
+        PlaneModLogger.Msg($"[PlaneModDataManager] SaveData dataManagementMode={dataManagementMode}");
         try
         {
             if (!File.Exists(CurrentDataPath))
             {
                 PlaneModLogger.WarnMissingFile(CurrentDataPath);
-                PlaneModLogger.Warn($"[PlaneModDataManager] Aborted SaveData");
+                PlaneModLogger.Warn($"[PlaneModDataManager] SaveData Failed!");
                 return;
             }
 
@@ -233,8 +235,8 @@ public class PlaneModDataManager
             }
             catch (NullReferenceException)
             {
-                PlaneModLogger.Warn($"[PlaneModDataManager] NullReferenceException in UpdateAircraftData!");;
-                PlaneModLogger.Warn($"[PlaneModDataManager] Aborted SaveData");
+                PlaneModLogger.Warn($"[PlaneModDataManager] NullReferenceException in UpdateAircraftData!");
+                PlaneModLogger.Warn($"[PlaneModDataManager] SaveData Failed!");
                 return;
             }
             PlaneModLogger.MsgVerbose($"[PlaneModDataManager] SaveData aircraftData to be saved {planeModData.aircraftData.Length}");
@@ -247,10 +249,12 @@ public class PlaneModDataManager
         catch (FileNotFoundException)
         {
             PlaneModLogger.Warn($"[PlaneModDataManager] {CurrentDataPath} not found!");
+            PlaneModLogger.Warn($"[PlaneModDataManager] SaveData Failed!");
         }
         catch (Exception e)
         {
             PlaneModLogger.Warn($"[PlaneModDataManager] Unknown error {e}!");
+            PlaneModLogger.Warn($"[PlaneModDataManager] SaveData Failed!");
         }
     }
     
@@ -258,22 +262,24 @@ public class PlaneModDataManager
     {
         if (CurrentDataPath == null)
         {
-            PlaneModLogger.Warn($"[PlaneModDataManager] CurrentSaveSlotInfo is null");
+            PlaneModLogger.Warn($"[PlaneModDataManager] CurrentDataPath is null");
+            PlaneModLogger.Warn($"[PlaneModDataManager] LoadData Failed!");
             dataLoadState = PlaneModDataLoadState.UnLoaded;
-            PlaneModLogger.Warn($"[PlaneModDataManager] Aborted LoadData");
             return;
         }
-        else
+        if (!File.Exists(CurrentDataPath))
         {
-            if(!File.Exists(CurrentDataPath)) PlaneModDataUtility.WriteDataWithBase(CurrentDataPath, PlaneModSettings.BASE_DATAPATH);
+            PlaneModLogger.Msg($"[PlaneModDataManager] CurrentDataPath doesn't exists. Creating One!");
+            PlaneModDataUtility.WriteDataWithBase(CurrentDataPath, PlaneModSettings.BASE_DATAPATH);
         }
-        PlaneModLogger.Msg($"[PlaneModDataManager] LoadData");
+        
+        PlaneModLogger.Msg($"[PlaneModDataManager] LoadData dataManagementMode={dataManagementMode}");
         try
         {
             if (!File.Exists(CurrentDataPath))
             {
                 PlaneModLogger.WarnMissingFile(CurrentDataPath);
-                PlaneModLogger.Warn($"[PlaneModDataManager] Aborted LoadData");
+                PlaneModLogger.Warn($"[PlaneModDataManager] LoadData Failed!");
                 dataLoadState = PlaneModDataLoadState.UnLoaded;
                 return;
             }
@@ -289,10 +295,12 @@ public class PlaneModDataManager
         {
             dataLoadState = PlaneModDataLoadState.UnLoaded;
             PlaneModLogger.Warn($"[PlaneModDataManager] {CurrentDataPath} not found!");
+            PlaneModLogger.Warn($"[PlaneModDataManager] LoadData Failed!");
         }
         catch (Exception e)
         {
             PlaneModLogger.Warn($"[PlaneModDataManager] Unknown error {e}!");
+            PlaneModLogger.Warn($"[PlaneModDataManager] LoadData Failed!");
         }
     }
 }
