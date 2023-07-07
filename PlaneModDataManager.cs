@@ -54,12 +54,9 @@ public class PlaneModDataManager
         
         PlaneModLogger.Msg($"[PlaneModDataManager] Initialized");
     }
-    /*
-    Only call UpdateModelStreaming call from MelonMod.OnSceneWasLoaded 
-    */
+    
     public void UpdateModelStreaming(string sceneGUID)
     {
-        // TODO: Find out a way to identify scene change!
         if (sceneGUID == lastSceneGUID) return;
         lastSceneGUID = sceneGUID;
 
