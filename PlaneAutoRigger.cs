@@ -1,4 +1,6 @@
-﻿namespace TLD_PlaneMod;
+﻿using VehicleDoor = Il2Cpp.VehicleDoor;
+
+namespace TLD_PlaneMod;
 
 public class PlaneAutoRigger
 {
@@ -11,7 +13,7 @@ public class PlaneAutoRigger
         definition = aDefinition;
     }
 
-    public GameObject Rig(GameObject prefab, Vector3 position)
+    public GameObject Rig(GameObject prefab, Vector3 position, Quaternion rotation, bool createKinematic_RB, float yPadding = 0)
     {
         PlaneModLogger.MsgVerbose($"[PlaneAutoRigger] Rig prefab={prefab.name}");
 
@@ -19,15 +21,18 @@ public class PlaneAutoRigger
         GameObject gameObject = GameObject.Instantiate(prefab);
 
         PlaneModLogger.MsgVerbose($"[PlaneAutoRigger] Rig Transform");
-        gameObject.transform.position = position;
+        gameObject.transform.position = position + Vector3.up * yPadding;
+        gameObject.transform.rotation = rotation;
 
 
         PlaneModLogger.MsgVerbose($"[PlaneAutoRigger] Rig worldCollider");
         FindGameObjectByName(gameObject, definition.worldCollider);
+        GameObject worldCollider = null;
 
         if (_recursiveFoundGameObject)
         {
             RigGameObjectWithConvexMeshCollider(_recursiveFoundGameObject);
+            worldCollider = _recursiveFoundGameObject;
             _recursiveFoundGameObject = null;
         }
 
@@ -48,19 +53,21 @@ public class PlaneAutoRigger
         rigidBody.drag = 0.5f;
         rigidBody.useGravity = true;
         rigidBody.mass = definition.mass;
+        if (createKinematic_RB) rigidBody.isKinematic = true;
 
         PlaneModLogger.MsgVerbose($"[PlaneAutoRigger] Fixing shaders");
 
         Shader standardShader = Shader.Find("Standard");
         new ShaderPostFixer(gameObject, standardShader);
+        
+        PlaneModLogger.MsgVerbose($"[PlaneAutoRigger] Rig Aircraft Scripts");
 
         Engine engine = new Engine(
             definition.enginePower, definition.maxRPM,
             definition.acceleration, definition.fuelCapacity,
             definition.fuelCapacity
         );
-
-        if(string.IsNullOrEmpty(definition.guid)) definition.guid = Guid.NewGuid().ToString();
+        
         Aircraft aircraft = new Aircraft(
             gameObject,
             rigidBody,
@@ -71,12 +78,54 @@ public class PlaneAutoRigger
             definition.maxSpeed,
             definition.minSpeed,
             definition.maxAltitude,
-            definition.guid
+            Guid.NewGuid().ToString()
         );
+
+        if (definition.stringData.ContainsKey("PROPULSION_Propeller"))
+        {
+            GameObject propellerGameObject = null;
+            FindGameObjectByName(gameObject, definition.stringData["PROPULSION_Propeller"]);
+
+            if (_recursiveFoundGameObject)
+            {
+                RigGameObjectWithConvexMeshCollider(_recursiveFoundGameObject);
+                propellerGameObject = _recursiveFoundGameObject;
+                _recursiveFoundGameObject = null;
+            }
+
+            if (propellerGameObject == null) 
+            {
+                PlaneModLogger.Warn($"[PlaneAutoRigger] PROPULSION_Propeller is missing!");
+            }
+            else
+            {
+                float propellerMaxRPM = 0;
+                
+                if(definition.floatData.ContainsKey("PROPULSION_Propeller_maxRPM"))
+                {
+                    propellerMaxRPM = definition.floatData["PROPULSION_Propeller_maxRPM"];
+                }
+                else
+                {
+                    PlaneModLogger.Warn($"[PlaneAutoRigger] PROPULSION_Propeller_maxRPM is missing!");
+                }
+
+                Propeller propeller = new Propeller();
+                
+                propeller.propellerTransform = propellerGameObject.transform;
+                propeller.engine = engine;
+                propeller.maxPropellerRPM = propellerMaxRPM;
+                
+                aircraft.AddComponent("PROPULSION_Propeller", propeller);
+                PlaneModLogger.MsgVerbose($"[PlaneAutoRigger] Added PROPULSION_Propeller");
+            }
+        }
+
+        AircraftController aircraftController = new AircraftController();
+        aircraft.AddComponent("aircraftController", aircraftController);
+        aircraft.SetComponentActive("aircraftController", false);
         
         AircraftManager.Singleton.AddNewAircraft(aircraft);
-        
-        PlaneModLogger.MsgVerbose($"[PlaneAutoRigger] Rigging is partial");
 
         return gameObject;
     }

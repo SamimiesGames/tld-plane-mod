@@ -9,6 +9,11 @@ public class PlaneModAssetDefinition
     public string prefabName;
     public string worldCollider;
     public string[] landingGear;
+
+    public Dictionary<string, float> floatData;
+    public Dictionary<string, int> intData;
+    public Dictionary<string, string> stringData;
+    public Dictionary<string, bool> booleanData;
     
     public float mass;
     public float enginePower;
@@ -36,6 +41,10 @@ public class PlaneModAssetDefinition
         return $"PlaneModAssetDefinition (dump)\n" +
                $"worldCollider={worldCollider}\n" +
                $"landingGear={landingGear}\n" +
+               $"floatData={floatData}\n" +
+               $"intData={intData}\n" +
+               $"stringData={stringData}\n" +
+               $"booleanData={booleanData}\n" +
                $"mass={mass}\n" +
                $"enginePower={enginePower}\n" +
                $"maxRPM={maxRPM}\n" +
@@ -73,7 +82,7 @@ public class PlaneModAssetManager
         PlaneModLogger.Msg($"[PlaneModAssetManager] Initialized");
     }
 
-    public GameObject SpawnPlane(string prefabName, Vector3 position, bool createNewDataInstance=true)
+    public GameObject SpawnPlane(string prefabName, Vector3 position, Quaternion rotation, bool createNewDataInstance=true)
     {
         PlaneModLogger.Msg($"[PlaneModAssetManager] SpawnPlane prefabName={prefabName}, position={position}, createNewDataInstance={createNewDataInstance}");
 
@@ -81,8 +90,7 @@ public class PlaneModAssetManager
         GameObject prefab = UnityBundleManager.Singleton.GetPrefabFromAssetBundle(PlaneModSettings.PLANEMOD_BUNDLENAME, definition.prefabName);
 
         PlaneAutoRigger planeAutoRigger = new PlaneAutoRigger(definition);
-
-        GameObject plane = planeAutoRigger.Rig(prefab, position);
+        GameObject plane = planeAutoRigger.Rig(prefab, position, rotation, false, !createNewDataInstance ? 0.5f : 0);
 
         Aircraft aircraft = AircraftManager.Singleton.aircrafts[AircraftManager.Singleton.aircrafts.Count-1];
         

@@ -5,6 +5,7 @@ public class PlaneModManager
     public static PlaneModManager Singleton;
     public string lastRegionName;
     
+    
     public PlaneModManager()
     {
         if (Singleton != null) return;
@@ -15,6 +16,11 @@ public class PlaneModManager
         new AircraftManager();
         new PlaneModDataManager();
         new PlaneModAssetManager();
+        
+        UnityBundleManager.Singleton.LoadAssetBundle(
+            PlaneModSettings.PLANEMOD_BUNDLENAME, 
+            PlaneModSettings.ASSETBUNDLE_PATH
+        );
         
         PlaneModLogger.Msg($"[PlaneModManager] Initialized");
     }

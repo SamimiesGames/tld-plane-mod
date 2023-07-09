@@ -7,6 +7,15 @@
       "CropDuster01_LeftLandingGear",
       "CropDuster01_RearLandingGear"
     ],
+    "floatData": {
+      "PROPULSION_Propeller_maxRPM": 800
+    },
+    "intData": {},
+    "stringData": {
+      "PROPULSION_Propeller": "CropDuster01_Properellor" 
+    },
+    "booleanData": {},
+
     "mass": 800,
     "enginePower": 396,
     "maxRPM": 4000,

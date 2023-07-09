@@ -29,10 +29,18 @@ public class Engine
         }
     }
 
+    public float RPMRatio
+    {
+        get
+        {
+            return rpm / maxRPM;
+        }
+    }
+
     public void Throttle(float normal, float delta)
     {
         rpm += (normal * acceleration) * delta;
         rpm = Mathf.Clamp(rpm, 0, maxRPM);
     }
-    
+
 }

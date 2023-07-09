@@ -40,6 +40,15 @@ public class PlaneModDataManager
             return path;
         }
     }
+    
+    public string StackTopPlaneGUID
+    {
+        get
+        {
+            PlaneModAircraftData data = planeModData.aircraftData[planeModData.aircraftData.Length-1];
+            return data.guid;
+        }
+    }
 
     public PlaneModDataManager()
     {
@@ -55,33 +64,35 @@ public class PlaneModDataManager
         PlaneModLogger.Msg($"[PlaneModDataManager] Initialized");
     }
     
-    public void UpdateModelStreaming(string sceneGUID)
+    public void UpdateModelStreaming(string sceneIdentifier, bool force = false)
     {
-        if (sceneGUID == lastSceneGUID) return;
-        lastSceneGUID = sceneGUID;
+        if (sceneIdentifier == lastSceneGUID && !force) return;
+        lastSceneGUID = sceneIdentifier;
 
         if(dataLoadState == PlaneModDataLoadState.UnLoaded) LoadData();
         
-        PlaneModLogger.Msg($"[PlaneModDataManager] UpdateModelStreaming dataLoadState={dataLoadState}, dataManagementMode={dataManagementMode}, sceneGUID={sceneGUID}");
+        PlaneModLogger.Msg($"[PlaneModDataManager] UpdateModelStreaming dataLoadState={dataLoadState}, dataManagementMode={dataManagementMode}, sceneIdentifier={sceneIdentifier}");
 
         AircraftManager.Singleton.UnLoadAll();
-        LoadAircraftForScene(sceneGUID);
+        LoadAircraftForScene(sceneIdentifier);
     }
 
-    public void LoadAircraftForScene(string sceneGUID)
+    public void LoadAircraftForScene(string sceneIdentifier)
     {
         foreach (var data in planeModData.aircraftData)
         {
-            if (data.sceneGUID == sceneGUID)
+            if (data.sceneGUID == sceneIdentifier)
             {
-                PlaneModLogger.Msg($"[PlaneModDataManager] LoadAircraftForScene asset={data.asset}, sceneGUID={sceneGUID}");
+                PlaneModLogger.Msg($"[PlaneModDataManager] LoadAircraftForScene asset={data.asset}, sceneIdentifier={sceneIdentifier}");
                 
                 Vector3 position = new Vector3(data.position[0], data.position[1], data.position[2]);
                 Vector3 velocity = new Vector3(data.velocity[0], data.velocity[1], data.velocity[2]);
                 Vector3 angularVelocity = new Vector3(data.angularVelocity[0], data.angularVelocity[1], data.angularVelocity[2]);
                 Vector3 guidance = new Vector3(data.guidance[0], data.guidance[1], data.guidance[2]);
+
+                Quaternion rotation = new Quaternion(data.rotation[0], data.rotation[1], data.rotation[2], data.rotation[3]);
                 
-                GameObject plane = PlaneModAssetManager.Singleton.SpawnPlane(data.asset, position, false);
+                GameObject plane = PlaneModAssetManager.Singleton.SpawnPlane(data.asset, position, rotation, false);
                 Aircraft aircraft = AircraftManager.Singleton.aircrafts[AircraftManager.Singleton.aircrafts.Count - 1];
 
                 aircraft.planeGameObject = plane;
@@ -101,6 +112,7 @@ public class PlaneModDataManager
     {
         PlaneModLogger.MsgVerbose($"[PlaneModDataManager] UpdateAircraftData airCrafts.Count={AircraftManager.Singleton.aircrafts.Count}");
         int dataInstancesUpdated = 0;
+        
         foreach (var aircraft in AircraftManager.Singleton.aircrafts)
         {
             bool found = false;
@@ -154,6 +166,23 @@ public class PlaneModDataManager
         PlaneModLogger.MsgVerbose($"[PlaneModDataManager] dataInstancesUpdated={dataInstancesUpdated}");
     }
 
+    public PlaneModAircraftData FindDataInstanceByGUID(string guid)
+    {
+        PlaneModAircraftData dataInstance = null;
+
+        
+        foreach (var data in planeModData.aircraftData)
+        {
+            if (data.guid == guid)
+            {
+                dataInstance = data;
+                break;
+            }
+        }
+
+        return dataInstance;
+    }
+
     public void CreateNewDataInstance(Aircraft aircraft, string prefabName)
     {
         PlaneModAircraftData data = new PlaneModAircraftData();
@@ -200,6 +229,35 @@ public class PlaneModDataManager
         planeModData.aircraftData = list.ToArray();
         
         PlaneModLogger.Msg($"[PlaneModDataManager] Created new data instance");
+    }
+    
+    public void DeleteDataInstance(string guid)
+    {
+        PlaneModAircraftData dataInstance = null;
+
+        int index = 0;
+        
+        foreach (var data in planeModData.aircraftData)
+        {
+            if (data.guid == guid)
+            {
+                dataInstance = data;
+                break;
+            }
+
+            index++;
+        }
+
+        if (dataInstance == null)
+        {
+            PlaneModLogger.Warn($"[PlaneModDataManager] DeleteDataInstance Failed, '{guid}' was not found!");
+            return;
+        }
+
+        List<PlaneModAircraftData> list = planeModData.aircraftData.ToList();
+        list.RemoveAt(index);
+        planeModData.aircraftData = list.ToArray();
+        PlaneModLogger.Msg($"[PlaneModDataManager] DeleteDataInstance guid={guid} index={index}");
     }
 
     public void SaveData()
@@ -266,7 +324,7 @@ public class PlaneModDataManager
         }
         if (!File.Exists(CurrentDataPath))
         {
-            PlaneModLogger.Msg($"[PlaneModDataManager] CurrentDataPath doesn't exists. Creating One!");
+            PlaneModLogger.Msg($"[PlaneModDataManager] CurrentDataPath doesn't exist. Creating One!");
             PlaneModDataUtility.WriteDataWithBase(CurrentDataPath, PlaneModSettings.BASE_DATAPATH);
         }
         

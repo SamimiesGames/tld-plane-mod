@@ -8,6 +8,18 @@ public static class PlaneModLoggerSettings
 
 public class PlaneModLogger
 {
+    public static void MsgHUD(string message)
+    {
+        Panel_HUD HUD;
+        InterfaceManager.TryGetPanel<Panel_HUD>(out HUD);
+        
+        if (!HUD) Warn($"[PlaneModLogger] Panel_HUD NOT FOUND!");
+        
+        HUDMessage.HUDMessageInfo messageInfo = new HUDMessage.HUDMessageInfo();
+        messageInfo.m_Text = message;
+        messageInfo.m_DisplayTime = 5f;
+        HUDMessage.ShowMessage(HUD, messageInfo);
+    }
     public static void MsgVerbose(string message)
     {
         if (PlaneModLoggerSettings.SILENT) return;

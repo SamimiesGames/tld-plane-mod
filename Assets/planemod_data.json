@@ -1,1 +1,240 @@
-﻿[]
+﻿[
+  {
+    "@type": "TLD_PlaneMod.PlaneModAircraftData",
+    "asset": "CropDuster01",
+    "sceneGUID": "AirfieldRegion",
+    "position": [
+      851.5346,
+      47.435684,
+      892.36926
+    ],
+    "rotation": [
+      -0.035955578,
+      0.55022204,
+      0.081866905,
+      -0.8302173
+    ],
+    "velocity": [
+      0,
+      0,
+      0
+    ],
+    "angularVelocity": [
+      0,
+      0,
+      0
+    ],
+    "guidance": [
+      0,
+      0,
+      0
+    ],
+    "rpm": 0,
+    "fuel": 85,
+    "guid": "dc22fbc0-5bfe-46a6-af9b-6e975676f39c"
+  },
+  {
+    "@type": "TLD_PlaneMod.PlaneModAircraftData",
+    "asset": "CropDuster01",
+    "sceneGUID": "RuralRegion",
+    "position": [
+      1497.4601,
+      46.718887,
+      1374.7836
+    ],
+    "rotation": [
+      0,
+      0,
+      0,
+      0
+    ],
+    "velocity": [
+      0.19883835,
+      0.32844195,
+      -1.5077627
+    ],
+    "angularVelocity": [
+      0,
+      0,
+      0
+    ],
+    "guidance": [
+      0,
+      0,
+      0
+    ],
+    "rpm": 0,
+    "fuel": 85,
+    "guid": "dc22fbc0-5bfe-46a6-ae9b-62gh5676f39c"
+  },
+  {
+    "@type": "TLD_PlaneMod.PlaneModAircraftData",
+    "asset": "CropDuster01",
+    "sceneGUID": "RuralRegion",
+    "position": [
+      851.1531,
+      47.23719,
+      891.11053
+    ],
+    "rotation": [
+      0.3046949,
+      0.4150915,
+      -0.52494353,
+      -0.6777127
+    ],
+    "velocity": [
+      0,
+      0,
+      0
+    ],
+    "angularVelocity": [
+      0,
+      0,
+      0
+    ],
+    "guidance": [
+      0,
+      0,
+      0
+    ],
+    "rpm": 0,
+    "fuel": 85,
+    "guid": "dc22fbc0-5bfe-46a6-ae9b-6e9756jjf39c"
+  },
+  {
+    "@type": "TLD_PlaneMod.PlaneModAircraftData",
+    "asset": "CropDuster01",
+    "sceneGUID": "MarshRegion",
+    "position": [
+      -28.038198,
+      161.92802,
+      -447.60312
+    ],
+    "rotation": [
+      -0.023904,
+      0.9458367,
+      -0.038572,
+      -0.3214558
+    ],
+    "velocity": [
+      0,
+      0,
+      0
+    ],
+    "angularVelocity": [
+      0,
+      0,
+      0
+    ],
+    "guidance": [
+      0,
+      0,
+      0
+    ],
+    "rpm": 0,
+    "fuel": 85,
+    "guid": "80c3471b-6e40-4c73-b8dc-44b366f35388"
+  },
+  {
+    "@type": "TLD_PlaneMod.PlaneModAircraftData",
+    "asset": "CropDuster01",
+    "sceneGUID": "AirfieldRegion",
+    "position": [
+      -897.0969,
+      264.61563,
+      1035.4891
+    ],
+    "rotation": [
+      0,
+      0.19372171,
+      0,
+      -0.9810565
+    ],
+    "velocity": [
+      0,
+      0,
+      0
+    ],
+    "angularVelocity": [
+      0,
+      0,
+      0
+    ],
+    "guidance": [
+      0,
+      0,
+      0
+    ],
+    "rpm": 0,
+    "fuel": 85,
+    "guid": "80c3471b-6e40-4c73-b8dc-44b366f35456"
+  },
+  {
+    "@type": "TLD_PlaneMod.PlaneModAircraftData",
+    "asset": "CropDuster01",
+    "sceneGUID": "AirfieldRegion",
+    "position": [
+      -709.0045,
+      175.5564,
+      -443.65424
+    ],
+    "rotation": [
+      0,
+      0.93847656,
+      0,
+      -0.34534296
+    ],
+    "velocity": [
+      0,
+      0,
+      0
+    ],
+    "angularVelocity": [
+      0,
+      0,
+      0
+    ],
+    "guidance": [
+      0,
+      0,
+      0
+    ],
+    "rpm": 0,
+    "fuel": 85,
+    "guid": "80c3471b-6e40-4c73-b8dc-44b366f35555"
+  },
+  {
+    "@type": "TLD_PlaneMod.PlaneModAircraftData",
+    "asset": "CropDuster01",
+    "sceneGUID": "AirfieldRegion",
+    "position": [
+      -27.88847,
+      160.37541,
+      -447.49005
+    ],
+    "rotation": [
+      0,
+      0.9468682,
+      0,
+      -0.32162187
+    ],
+    "velocity": [
+      0,
+      0,
+      0
+    ],
+    "angularVelocity": [
+      0,
+      0,
+      0
+    ],
+    "guidance": [
+      0,
+      0,
+      0
+    ],
+    "rpm": 0,
+    "fuel": 85,
+    "guid": "80c3471b-6e40-4c73-b8dc-44b366f35344"
+  }
+]

@@ -15,6 +15,19 @@ public class AircraftManager
         PlaneModLogger.Msg($"[AircraftManager] Initialized");
     }
 
+    public Aircraft GetAircraftByGUID(string guid)
+    {
+        foreach (var aircraft in aircrafts)
+        {
+            if (aircraft.guid == guid)
+            {
+                return aircraft;
+            }
+        }
+
+        return null;
+    }
+
     public void Update(float timeDelta)
     {
         EliminateNulls();
@@ -54,10 +67,20 @@ public class AircraftManager
         aircrafts.Add(aircraft);
     }
 
-    public void RemoveAircraft(Aircraft aircraft)
+    public void RemoveAircraft(Aircraft aircraft, bool deleteDataInstance = false)
     {
-        PlaneModLogger.Msg($"[AircraftManager] RemoveAircraft aircraft={aircraft.planeGameObject.name}");
+        if (deleteDataInstance)
+        {
+            PlaneModDataManager.Singleton.DeleteDataInstance(aircraft.guid);
+        }
         PlaneModDataManager.Singleton.UpdateAircraftData();
+        
+        if (aircraft.planeGameObject == null)
+        {
+            PlaneModLogger.Warn($"[AircraftManager] RemoveAircraft (from presentation) Failed, because aircraft.planeGameObject is null!");
+            return;
+        }
+        PlaneModLogger.Msg($"[AircraftManager] RemoveAircraft (from presentation) aircraft={aircraft.planeGameObject.name}");
         
         aircrafts.Remove(aircraft);
         
@@ -68,7 +91,7 @@ public class AircraftManager
     {
         PlaneModLogger.Msg($"[AircraftManager] UnLoadAll");
 
-        foreach (var aircraft in aircrafts)
+        foreach (var aircraft in new List<Aircraft>(aircrafts))
         {
             RemoveAircraft(aircraft);
         }
