@@ -63,5 +63,9 @@ public class UnityBundleManager
         {
             PlaneModLogger.MsgVerbose($"[UnityBundleManager] Asset = \"{name}\"");
         }
+        foreach (var name in assetBundle.GetAllScenePaths())
+        {
+            PlaneModLogger.MsgVerbose($"[UnityBundleManager] ScenePath = \"{name}\"");
+        }
     }
 }
